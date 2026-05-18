@@ -3,7 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Signature Resizer — Govt Exam Tool</title>
+<title>Signature Resizer & Cropper — Govt Exam Tool</title>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
 <style>
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
   :root {
@@ -31,13 +32,12 @@
     justify-content: center;
     padding: 2rem 1rem;
   }
-  .app { width: 100%; max-width: 640px; }
+  .app { width: 100%; max-width: 720px; }
   .app-header { margin-bottom: 1.75rem; }
   .app-header h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.3px; }
   .app-header p { font-size: 13px; color: var(--text2); margin-top: 4px; }
   .pill { display: inline-block; background: var(--green-bg); color: var(--green); font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-left: 8px; vertical-align: middle; }
 
-  /* Drop zone */
   .drop-zone {
     border: 2px dashed var(--border2);
     border-radius: var(--radius);
@@ -49,17 +49,14 @@
   }
   .drop-zone:hover, .drop-zone.drag { border-color: #3B6D11; background: var(--green-bg); }
   .drop-zone svg { width: 40px; height: 40px; stroke: var(--text3); margin-bottom: 0.75rem; }
-  .drop-zone:hover svg, .drop-zone.drag svg { stroke: var(--green); }
   .drop-label { font-size: 15px; font-weight: 500; color: var(--text); }
   .drop-sub { font-size: 12px; color: var(--text3); margin-top: 5px; }
   #fileInput { display: none; }
 
-  /* Card */
   .card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 1rem 1.25rem; }
   .section { margin-top: 1.25rem; }
   .sec-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.75rem; }
 
-  /* Controls grid */
   .controls-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .ctrl-card { background: var(--surface2); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 0.75rem 0.875rem; }
   .ctrl-card.full { grid-column: 1 / -1; }
@@ -68,7 +65,13 @@
   .ctrl-card .ctrl-hint { font-size: 11px; color: var(--text3); margin-top: 4px; }
   .val-badge { float: right; font-size: 12px; font-weight: 600; color: var(--text); }
 
-  /* Toggle */
+  /* Input fields for Dimensions */
+  .dim-input-group { display: flex; align-items: center; gap: 8px; margin-top: 5px; }
+  .dim-input-group input { 
+    width: 100%; padding: 6px; border: 1px solid var(--border2); border-radius: 4px; font-size: 13px; outline: none;
+  }
+  .dim-input-group input:focus { border-color: var(--green); }
+
   .toggle-row { display: flex; align-items: center; justify-content: space-between; }
   .toggle { position: relative; width: 36px; height: 20px; flex-shrink: 0; }
   .toggle input { opacity: 0; width: 0; height: 0; }
@@ -77,13 +80,14 @@
   .tog-track::before { content: ''; position: absolute; width: 14px; height: 14px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: transform 0.2s; }
   .toggle input:checked + .tog-track::before { transform: translateX(16px); }
 
-  /* Range */
   .range-wrap { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
   .range-wrap input[type=range] { flex: 1; accent-color: var(--green); height: 4px; cursor: pointer; }
   .range-wrap .rng-min, .range-wrap .rng-max { font-size: 11px; color: var(--text3); min-width: 20px; }
-  .range-wrap .rng-max { text-align: right; }
 
-  /* Preview */
+  /* Cropper Styling */
+  .crop-container { width: 100%; max-height: 350px; background: #000; border-radius: var(--radius-sm); overflow: hidden; margin-bottom: 1rem; }
+  .crop-container img { display: block; max-width: 100%; }
+
   .preview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .pv-box { background: var(--surface2); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 0.75rem; text-align: center; }
   .pv-box .pv-lbl { font-size: 11px; color: var(--text3); margin-bottom: 8px; font-weight: 500; }
@@ -94,27 +98,20 @@
   }
   .pv-box .pv-meta { font-size: 11px; color: var(--text2); margin-top: 6px; }
 
-  /* Size badge */
   .sz-badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
   .sz-ok { background: var(--green-bg); color: var(--green); }
   .sz-warn { background: var(--amber-bg); color: var(--amber); }
   .sz-err { background: var(--red-bg); color: var(--red); }
 
-  /* Status */
   .status { margin-top: 1rem; padding: 0.625rem 0.875rem; border-radius: var(--radius-sm); font-size: 13px; display: none; }
   .status.ok  { background: var(--green-bg); color: var(--green); border: 0.5px solid #C0DD97; }
   .status.warn{ background: var(--amber-bg); color: var(--amber); border: 0.5px solid #FAC775; }
   .status.err { background: var(--red-bg);   color: var(--red);   border: 0.5px solid #F7C1C1; }
 
-  /* Buttons */
   .btn-row { display: flex; gap: 10px; margin-top: 1rem; }
   .btn { padding: 9px 20px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; border: none; transition: opacity 0.15s, background 0.15s; display: flex; align-items: center; gap: 6px; }
   .btn-primary { background: var(--text); color: #fff; }
-  .btn-primary:hover { opacity: 0.82; }
-  .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
   .btn-sec { background: transparent; color: var(--text2); border: 0.5px solid var(--border2); }
-  .btn-sec:hover { background: var(--surface2); }
-
   .hidden { display: none !important; }
 </style>
 </head>
@@ -122,125 +119,109 @@
 <div class="app">
   <div class="app-header">
     <h1>Signature Resizer <span class="pill">3–30 KB</span></h1>
-    <p>Remove background opacity &amp; resize for govt exam forms — UPSC, SSC, IBPS &amp; more</p>
+    <p>Crop, resize dimensions, and remove background for govt exam forms.</p>
   </div>
 
-  <!-- Drop zone -->
   <div class="drop-zone" id="dropZone">
-    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
       <path d="M4 16.004V17a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m-4-4l4-4 4 4"/>
     </svg>
-    <div class="drop-label">Drop your signature image here</div>
-    <div class="drop-sub">or click to browse &nbsp;·&nbsp; JPG, PNG, BMP accepted</div>
+    <div class="drop-label">Drop your signature here</div>
+    <div class="drop-sub">or click to browse</div>
     <input type="file" id="fileInput" accept="image/*">
   </div>
 
-  <!-- Controls (hidden until file loaded) -->
   <div id="controls" class="hidden">
     <div class="section">
-      <div class="sec-label">Processing options</div>
-      <div class="controls-grid">
+      <div class="sec-label">1. Crop Signature</div>
+      <div class="crop-container">
+        <img id="cropTarget">
+      </div>
+    </div>
 
+    <div class="section">
+      <div class="sec-label">2. Processing options</div>
+      <div class="controls-grid">
+        
         <div class="ctrl-card">
-          <div class="toggle-row">
-            <div>
-              <div class="ctrl-title">Remove background</div>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" id="removeBg" checked>
-              <span class="tog-track"></span>
-            </label>
+          <div class="ctrl-title">Target Dimensions (px)</div>
+          <div class="dim-input-group">
+            <input type="number" id="targetW" value="256" placeholder="Width">
+            <span style="color:var(--text3)">×</span>
+            <input type="number" id="targetH" value="128" placeholder="Height">
           </div>
-          <div class="ctrl-hint">Removes white/light background pixels</div>
+          <div class="ctrl-hint">Common: 200×230 or 140×60</div>
         </div>
 
         <div class="ctrl-card">
           <div class="toggle-row">
-            <div>
-              <div class="ctrl-title">White background</div>
-            </div>
-            <label class="toggle">
-              <input type="checkbox" id="whiteBg">
-              <span class="tog-track"></span>
-            </label>
+            <div class="ctrl-title">Remove BG</div>
+            <label class="toggle"><input type="checkbox" id="removeBg" checked><span class="tog-track"></span></label>
           </div>
-          <div class="ctrl-hint">Fill transparent areas with white</div>
+          <div class="toggle-row" style="margin-top:8px">
+            <div class="ctrl-title">White Fill</div>
+            <label class="toggle"><input type="checkbox" id="whiteBg"><span class="tog-track"></span></label>
+          </div>
         </div>
 
         <div class="ctrl-card full">
           <label>Background removal tolerance &nbsp;<span class="val-badge" id="tolVal">40</span></label>
           <div class="range-wrap">
             <span class="rng-min">0</span>
-            <input type="range" id="tolerance" min="0" max="120" value="40" step="1">
+            <input type="range" id="tolerance" min="0" max="120" value="40">
             <span class="rng-max">120</span>
           </div>
-          <div class="ctrl-hint" style="margin-top:6px;">Higher = removes more light pixels. Lower if your ink is light.</div>
         </div>
 
         <div class="ctrl-card full">
           <label>Target output size &nbsp;<span class="val-badge" id="targetVal">20</span> KB</label>
           <div class="range-wrap">
             <span class="rng-min">3</span>
-            <input type="range" id="targetSize" min="3" max="30" value="20" step="1">
+            <input type="range" id="targetSize" min="3" max="30" value="20">
             <span class="rng-max">30</span>
           </div>
-          <div class="ctrl-hint" style="margin-top:6px;">Minimum 3 KB · Maximum 30 KB required by most portals</div>
         </div>
-
       </div>
     </div>
 
-    <!-- Preview -->
-    <div class="section" id="previewSection">
-      <div class="sec-label">Preview</div>
-      <div class="preview-grid">
-        <div class="pv-box">
-          <div class="pv-lbl">Original</div>
-          <canvas id="origCanvas"></canvas>
-          <div class="pv-meta" id="origMeta">—</div>
-        </div>
-        <div class="pv-box">
-          <div class="pv-lbl">Processed</div>
-          <canvas id="procCanvas"></canvas>
-          <div class="pv-meta" id="procMeta">—</div>
-        </div>
+    <div class="section">
+      <div class="sec-label">3. Preview</div>
+      <div class="pv-box">
+        <canvas id="procCanvas"></canvas>
+        <div class="pv-meta" id="procMeta">—</div>
       </div>
     </div>
 
     <div id="statusBar" class="status"></div>
 
     <div class="btn-row">
-      <button class="btn btn-primary" id="downloadBtn">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-        Process &amp; Download
-      </button>
+      <button class="btn btn-primary" id="downloadBtn">Process &amp; Download</button>
       <button class="btn btn-sec" id="resetBtn">Reset</button>
     </div>
   </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
 <script>
-const dropZone   = document.getElementById('dropZone');
-const fileInput  = document.getElementById('fileInput');
-const controls   = document.getElementById('controls');
+const dropZone = document.getElementById('dropZone');
+const fileInput = document.getElementById('fileInput');
+const controls = document.getElementById('controls');
+const cropTarget = document.getElementById('cropTarget');
+const procCanvas = document.getElementById('procCanvas');
+const procMeta = document.getElementById('procMeta');
+const statusBar = document.getElementById('statusBar');
+
+// Inputs
+const targetW = document.getElementById('targetW');
+const targetH = document.getElementById('targetH');
+const tolSlider = document.getElementById('tolerance');
+const targetSldr = document.getElementById('targetSize');
 const removeBgCk = document.getElementById('removeBg');
 const whiteBgCk  = document.getElementById('whiteBg');
-const tolSlider  = document.getElementById('tolerance');
-const tolValEl   = document.getElementById('tolVal');
-const targetSldr = document.getElementById('targetSize');
-const targetValEl= document.getElementById('targetVal');
-const downloadBtn= document.getElementById('downloadBtn');
-const resetBtn   = document.getElementById('resetBtn');
-const origCanvas = document.getElementById('origCanvas');
-const procCanvas = document.getElementById('procCanvas');
-const origMeta   = document.getElementById('origMeta');
-const procMeta   = document.getElementById('procMeta');
-const statusBar  = document.getElementById('statusBar');
 
-let origImg = null;
-let origFileSize = 0;
+let cropper = null;
 
-/* ── Drag & drop ── */
+/* ── File Handling ── */
 dropZone.addEventListener('click', () => fileInput.click());
 dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag'); });
 dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag'));
@@ -251,169 +232,121 @@ dropZone.addEventListener('drop', e => {
 });
 fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadFile(fileInput.files[0]); });
 
-/* ── Load file ── */
 function loadFile(f) {
-  origFileSize = f.size;
   const reader = new FileReader();
   reader.onload = ev => {
-    const img = new Image();
-    img.onload = () => {
-      origImg = img;
-      drawToCanvas(origCanvas, img, null);
-      origMeta.textContent = img.width + '×' + img.height + 'px · ' + (f.size/1024).toFixed(1) + ' KB';
-      controls.classList.remove('hidden');
-      showStatus('', '');
-      runPreview();
-    };
-    img.src = ev.target.result;
+    if(cropper) cropper.destroy();
+    cropTarget.src = ev.target.result;
+    controls.classList.remove('hidden');
+    dropZone.classList.add('hidden');
+    
+    cropper = new Cropper(cropTarget, {
+      viewMode: 1,
+      autoCropArea: 0.9,
+      ready() { runPreview(); },
+      cropend() { runPreview(); },
+      zoom() { runPreview(); }
+    });
   };
   reader.readAsDataURL(f);
 }
 
-/* ── Draw to preview canvas ── */
-function drawToCanvas(canvas, img, offscreen) {
-  const src = offscreen || img;
-  const ratio = Math.min(260 / src.width, 90 / src.height, 1);
-  canvas.width  = Math.round(src.width  * ratio);
-  canvas.height = Math.round(src.height * ratio);
-  const ctx = canvas.getContext('2d');
-  ctx.clearRect(0, 0, canvas.width, canvas.height);
-  ctx.drawImage(src, 0, 0, canvas.width, canvas.height);
-}
-
-/* ── Process image ── */
+/* ── Core Processing Logic ── */
 function processImage() {
-  if (!origImg) return null;
-  const tol = parseInt(tolSlider.value);
-  const doRemove = removeBgCk.checked;
-  const doWhite  = whiteBgCk.checked;
+  if (!cropper) return null;
 
-  const oc = document.createElement('canvas');
-  oc.width = origImg.width; oc.height = origImg.height;
+  // 1. Get Cropped & Resized Canvas
+  const width = parseInt(targetW.value) || 200;
+  const height = parseInt(targetH.value) || 100;
+  
+  const oc = cropper.getCroppedCanvas({ width, height });
   const ctx = oc.getContext('2d');
+  const tol = parseInt(tolSlider.value);
 
-  if (doWhite) { ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, oc.width, oc.height); }
-  ctx.drawImage(origImg, 0, 0);
+  // 2. Filter Processing
+  const id = ctx.getImageData(0, 0, oc.width, oc.height);
+  const px = id.data;
 
-  if (doRemove) {
-    const id = ctx.getImageData(0, 0, oc.width, oc.height);
-    const px = id.data;
+  if (removeBgCk.checked) {
     for (let i = 0; i < px.length; i += 4) {
       const brightness = (px[i] + px[i+1] + px[i+2]) / 3;
-      if (brightness > 255 - tol) px[i+3] = 0;
+      if (brightness > 255 - tol) px[i+3] = 0; // Make transparent
     }
     ctx.putImageData(id, 0, 0);
   }
 
-  if (doWhite && doRemove) {
-    const id = ctx.getImageData(0, 0, oc.width, oc.height);
-    const px = id.data;
-    for (let i = 0; i < px.length; i += 4) {
-      if (px[i+3] === 0) { px[i]=255; px[i+1]=255; px[i+2]=255; px[i+3]=255; }
-    }
-    ctx.putImageData(id, 0, 0);
+  // 3. Final background color (must be flat for JPEG)
+  const finalCanvas = document.createElement('canvas');
+  finalCanvas.width = width; finalCanvas.height = height;
+  const fctx = finalCanvas.getContext('2d');
+  
+  // Always fill white if exporting to JPEG or if user requested whiteBg
+  if (whiteBgCk.checked || true) { 
+    fctx.fillStyle = '#ffffff';
+    fctx.fillRect(0, 0, width, height);
   }
+  fctx.drawImage(oc, 0, 0);
 
-  return oc;
+  return finalCanvas;
 }
 
-/* ── Binary-search JPEG quality to hit target KB ── */
 function getDataUrl(canvas, targetKB) {
   const targetBytes = targetKB * 1024;
-  let lo = 0.05, hi = 0.99, q = 0.85, dataUrl;
-
-  for (let i = 0; i < 16; i++) {
+  let lo = 0.05, hi = 1.0, q = 0.8, dataUrl;
+  for (let i = 0; i < 10; i++) {
     dataUrl = canvas.toDataURL('image/jpeg', q);
     const sz = atob(dataUrl.split(',')[1]).length;
-    if (sz > targetBytes) hi = q;
-    else lo = q;
+    if (sz > targetBytes) hi = q; else lo = q;
     q = (lo + hi) / 2;
   }
-
-  dataUrl = canvas.toDataURL('image/jpeg', q);
-  const finalSz = atob(dataUrl.split(',')[1]).length;
-  if (finalSz < 3072) dataUrl = canvas.toDataURL('image/jpeg', 0.99);
   return dataUrl;
 }
 
-/* ── Live preview ── */
 function runPreview() {
   const processed = processImage();
   if (!processed) return;
-  drawToCanvas(procCanvas, null, processed);
+
+  // Update Preview Canvas
+  const previewCtx = procCanvas.getContext('2d');
+  procCanvas.width = processed.width;
+  procCanvas.height = processed.height;
+  previewCtx.drawImage(processed, 0, 0);
 
   const targetKB = parseInt(targetSldr.value);
-  const dataUrl  = getDataUrl(processed, targetKB);
-  const bytes    = atob(dataUrl.split(',')[1]).length;
-  const kb       = (bytes / 1024).toFixed(1);
+  const dataUrl = getDataUrl(processed, targetKB);
+  const bytes = atob(dataUrl.split(',')[1]).length;
+  const kb = (bytes / 1024).toFixed(1);
 
-  let badgeCls, msg, statusCls;
-  if (bytes >= 3072 && bytes <= 30720) {
-    badgeCls = 'sz-ok'; statusCls = 'ok';
-    msg = '✓ File is ' + kb + ' KB — within the 3–30 KB limit.';
-  } else if (bytes < 3072) {
-    badgeCls = 'sz-warn'; statusCls = 'warn';
-    msg = '⚠ File is ' + kb + ' KB — below the 3 KB minimum. Try increasing target size.';
-  } else {
-    badgeCls = 'sz-err'; statusCls = 'err';
-    msg = '✗ File is ' + kb + ' KB — above the 30 KB limit. Lower the target size.';
-  }
-
-  procMeta.innerHTML = processed.width + '×' + processed.height + 'px &nbsp;·&nbsp; <span class="sz-badge ' + badgeCls + '">' + kb + ' KB</span>';
-  showStatus(msg, statusCls);
+  let statusCls = (bytes >= 3072 && bytes <= 30720) ? 'ok' : 'warn';
+  procMeta.innerHTML = `${processed.width}×${processed.height}px · <span class="sz-badge sz-${statusCls}">${kb} KB</span>`;
+  showStatus(bytes < 3072 ? 'Too small (under 3KB)' : bytes > 30720 ? 'Too large (over 30KB)' : 'Valid size', statusCls);
 }
 
-/* ── Status bar ── */
+/* ── UI Helpers ── */
 function showStatus(msg, type) {
-  if (!msg) { statusBar.style.display = 'none'; return; }
   statusBar.textContent = msg;
   statusBar.className = 'status ' + type;
   statusBar.style.display = 'block';
 }
 
-/* ── Slider live update ── */
-tolSlider.addEventListener('input', () => { tolValEl.textContent = tolSlider.value; runPreview(); });
-targetSldr.addEventListener('input', () => { targetValEl.textContent = targetSldr.value; runPreview(); });
-removeBgCk.addEventListener('change', runPreview);
-whiteBgCk.addEventListener('change', runPreview);
-
-/* ── Download ── */
-downloadBtn.addEventListener('click', () => {
-  if (!origImg) return;
-  downloadBtn.disabled = true;
-  downloadBtn.textContent = 'Processing…';
-
-  setTimeout(() => {
-    const processed = processImage();
-    const targetKB  = parseInt(targetSldr.value);
-    const dataUrl   = getDataUrl(processed, targetKB);
-    const bytes     = atob(dataUrl.split(',')[1]).length;
-    const kb        = (bytes / 1024).toFixed(1);
-
-    const a = document.createElement('a');
-    a.href = dataUrl;
-    a.download = 'signature_' + kb + 'kb.jpg';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-
-    downloadBtn.disabled = false;
-    downloadBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Process &amp; Download';
-
-    if (bytes >= 3072 && bytes <= 30720)
-      showStatus('✓ Downloaded! ' + kb + ' KB — valid for govt exam portals.', 'ok');
-    else
-      showStatus('⚠ Downloaded at ' + kb + ' KB — adjust settings for the 3–30 KB requirement.', 'warn');
-  }, 60);
+[targetW, targetH, tolSlider, targetSldr, removeBgCk, whiteBgCk].forEach(el => {
+  el.addEventListener('input', () => {
+    document.getElementById('tolVal').textContent = tolSlider.value;
+    document.getElementById('targetVal').textContent = targetSldr.value;
+    runPreview();
+  });
 });
 
-/* ── Reset ── */
-resetBtn.addEventListener('click', () => {
-  origImg = null; origFileSize = 0;
-  controls.classList.add('hidden');
-  fileInput.value = '';
-  showStatus('', '');
+document.getElementById('downloadBtn').addEventListener('click', () => {
+  const canvas = processImage();
+  const dataUrl = getDataUrl(canvas, parseInt(targetSldr.value));
+  const a = document.createElement('a');
+  a.href = dataUrl;
+  a.download = `signature_${targetW.value}x${targetH.value}.jpg`;
+  a.click();
 });
+
+document.getElementById('resetBtn').addEventListener('click', () => location.reload());
 </script>
 </body>
 </html>
