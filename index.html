@@ -5,292 +5,202 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Signature Resizer — Govt Exam Tool</title>
 <style>
-*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-:root {
-  --bg: #f5f4f0; --surface: #ffffff; --surface2: #f0efe9;
-  --border: rgba(0,0,0,0.1); --border2: rgba(0,0,0,0.18);
-  --text: #1a1a18; --text2: #5f5e5a; --text3: #888780;
-  --green: #3B6D11; --green-bg: #EAF3DE; --green-bd: #C0DD97;
-  --amber: #854F0B; --amber-bg: #FAEEDA; --amber-bd: #FAC775;
-  --red: #A32D2D; --red-bg: #FCEBEB; --red-bd: #F7C1C1;
-  --blue: #185FA5; --blue-bg: #E6F1FB;
-  --radius: 10px; --radius-sm: 6px;
-}
-body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; display: flex; align-items: flex-start; justify-content: center; padding: 2rem 1rem; }
-.app { width: 100%; max-width: 660px; }
-h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.3px; }
-.subtitle { font-size: 13px; color: var(--text2); margin-top: 4px; margin-bottom: 1.75rem; }
-.pill { display: inline-block; background: var(--green-bg); color: var(--green); font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-left: 8px; vertical-align: middle; }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  :root {
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --surface2: #f0efe9;
+    --border: rgba(0,0,0,0.1);
+    --border2: rgba(0,0,0,0.2);
+    --text: #1a1a18;
+    --text2: #5f5e5a;
+    --text3: #888780;
+    --green: #3B6D11; --green-bg: #EAF3DE;
+    --amber: #854F0B; --amber-bg: #FAEEDA;
+    --red: #A32D2D; --red-bg: #FCEBEB;
+    --radius: 10px;
+    --radius-sm: 6px;
+  }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    padding: 2rem 1rem;
+  }
+  .app { width: 100%; max-width: 640px; }
+  .app-header { margin-bottom: 1.75rem; }
+  .app-header h1 { font-size: 22px; font-weight: 600; letter-spacing: -0.3px; }
+  .app-header p { font-size: 13px; color: var(--text2); margin-top: 4px; }
+  .pill { display: inline-block; background: var(--green-bg); color: var(--green); font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 20px; margin-left: 8px; vertical-align: middle; }
 
-/* Drop zone */
-.drop-zone { border: 2px dashed var(--border2); border-radius: var(--radius); background: var(--surface); padding: 2.5rem 1.5rem; text-align: center; cursor: pointer; transition: border-color .15s, background .15s; }
-.drop-zone:hover, .drop-zone.drag { border-color: var(--green); background: var(--green-bg); }
-.drop-icon { font-size: 36px; margin-bottom: 0.75rem; }
-.drop-label { font-size: 15px; font-weight: 500; }
-.drop-sub { font-size: 12px; color: var(--text3); margin-top: 5px; }
-#fileInput { display: none; }
+  /* Drop zone */
+  .drop-zone {
+    border: 2px dashed var(--border2);
+    border-radius: var(--radius);
+    background: var(--surface);
+    padding: 2.5rem 1.5rem;
+    text-align: center;
+    cursor: pointer;
+    transition: border-color 0.15s, background 0.15s;
+  }
+  .drop-zone:hover, .drop-zone.drag { border-color: #3B6D11; background: var(--green-bg); }
+  .drop-zone svg { width: 40px; height: 40px; stroke: var(--text3); margin-bottom: 0.75rem; }
+  .drop-zone:hover svg, .drop-zone.drag svg { stroke: var(--green); }
+  .drop-label { font-size: 15px; font-weight: 500; color: var(--text); }
+  .drop-sub { font-size: 12px; color: var(--text3); margin-top: 5px; }
+  #fileInput { display: none; }
 
-/* Tabs */
-.tabs { display: flex; gap: 4px; margin-top: 1.25rem; background: var(--surface2); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 4px; }
-.tab { flex: 1; padding: 7px 10px; border: none; background: transparent; border-radius: 4px; font-size: 13px; font-weight: 500; color: var(--text2); cursor: pointer; transition: background .15s, color .15s; }
-.tab.active { background: var(--surface); color: var(--text); box-shadow: 0 1px 3px rgba(0,0,0,0.08); }
+  /* Card */
+  .card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 1rem 1.25rem; }
+  .section { margin-top: 1.25rem; }
+  .sec-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 0.75rem; }
 
-/* Panels */
-.panel { display: none; margin-top: 1rem; }
-.panel.active { display: block; }
-.sec-label { font-size: 11px; font-weight: 600; color: var(--text3); text-transform: uppercase; letter-spacing: .07em; margin-bottom: .75rem; }
-.card { background: var(--surface); border: 0.5px solid var(--border); border-radius: var(--radius); padding: 1rem 1.25rem; }
-.ctrl-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.ctrl { background: var(--surface2); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: .75rem .875rem; }
-.ctrl.full { grid-column: 1 / -1; }
-.ctrl-title { font-size: 13px; font-weight: 500; color: var(--text); }
-.ctrl-hint { font-size: 11px; color: var(--text3); margin-top: 4px; }
-.ctrl label { font-size: 12px; color: var(--text2); display: block; margin-bottom: 4px; }
-.val-badge { float: right; font-size: 12px; font-weight: 600; color: var(--text); }
+  /* Controls grid */
+  .controls-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .ctrl-card { background: var(--surface2); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 0.75rem 0.875rem; }
+  .ctrl-card.full { grid-column: 1 / -1; }
+  .ctrl-card label { font-size: 12px; color: var(--text2); display: block; margin-bottom: 4px; }
+  .ctrl-card .ctrl-title { font-size: 13px; font-weight: 500; color: var(--text); }
+  .ctrl-card .ctrl-hint { font-size: 11px; color: var(--text3); margin-top: 4px; }
+  .val-badge { float: right; font-size: 12px; font-weight: 600; color: var(--text); }
 
-/* Toggle */
-.row { display: flex; align-items: center; justify-content: space-between; }
-.toggle { position: relative; width: 36px; height: 20px; flex-shrink: 0; }
-.toggle input { opacity: 0; width: 0; height: 0; }
-.tog { position: absolute; inset: 0; background: var(--border2); border-radius: 20px; cursor: pointer; transition: background .2s; }
-.toggle input:checked + .tog { background: var(--green); }
-.tog::before { content:''; position:absolute; width:14px; height:14px; left:3px; bottom:3px; background:#fff; border-radius:50%; transition:transform .2s; }
-.toggle input:checked + .tog::before { transform: translateX(16px); }
+  /* Toggle */
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; }
+  .toggle { position: relative; width: 36px; height: 20px; flex-shrink: 0; }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .tog-track { position: absolute; inset: 0; background: var(--border2); border-radius: 20px; cursor: pointer; transition: background 0.2s; }
+  .toggle input:checked + .tog-track { background: var(--green); }
+  .tog-track::before { content: ''; position: absolute; width: 14px; height: 14px; left: 3px; bottom: 3px; background: #fff; border-radius: 50%; transition: transform 0.2s; }
+  .toggle input:checked + .tog-track::before { transform: translateX(16px); }
 
-/* Range */
-.range-wrap { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
-.range-wrap input[type=range] { flex:1; accent-color: var(--green); cursor:pointer; }
-.rng-lbl { font-size: 11px; color: var(--text3); min-width: 26px; }
-.rng-lbl:last-child { text-align: right; }
+  /* Range */
+  .range-wrap { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+  .range-wrap input[type=range] { flex: 1; accent-color: var(--green); height: 4px; cursor: pointer; }
+  .range-wrap .rng-min, .range-wrap .rng-max { font-size: 11px; color: var(--text3); min-width: 20px; }
+  .range-wrap .rng-max { text-align: right; }
 
-/* Number input */
-.num-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
-.num-row input[type=number] { width: 80px; padding: 5px 8px; border: 0.5px solid var(--border2); border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; color: var(--text); background: var(--surface); }
-.num-row span { font-size: 12px; color: var(--text3); }
-.lock-btn { background: transparent; border: 0.5px solid var(--border2); border-radius: var(--radius-sm); padding: 4px 8px; font-size: 11px; cursor: pointer; color: var(--text2); transition: background .15s; }
-.lock-btn.locked { background: var(--blue-bg); color: var(--blue); border-color: var(--blue); }
+  /* Preview */
+  .preview-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .pv-box { background: var(--surface2); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: 0.75rem; text-align: center; }
+  .pv-box .pv-lbl { font-size: 11px; color: var(--text3); margin-bottom: 8px; font-weight: 500; }
+  .pv-box canvas {
+    max-width: 100%; height: 90px; object-fit: contain; border-radius: 4px;
+    background: repeating-conic-gradient(#ccc 0% 25%, #eee 0% 50%) 0 0/14px 14px;
+    display: block; margin: 0 auto;
+  }
+  .pv-box .pv-meta { font-size: 11px; color: var(--text2); margin-top: 6px; }
 
-/* Crop canvas */
-.crop-wrap { position: relative; background: #888; border-radius: var(--radius-sm); overflow: hidden; cursor: crosshair; user-select: none; margin-bottom: .75rem; display: flex; align-items: center; justify-content: center; }
-#cropCanvas { display: block; max-width: 100%; }
-.crop-overlay { position: absolute; inset: 0; pointer-events: none; }
-#selBox { position: absolute; border: 2px solid #fff; box-shadow: 0 0 0 9999px rgba(0,0,0,0.45); pointer-events: none; display: none; }
-.handle { position: absolute; width: 10px; height: 10px; background: #fff; border-radius: 2px; pointer-events: all; cursor: pointer; display: none; }
+  /* Size badge */
+  .sz-badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .sz-ok { background: var(--green-bg); color: var(--green); }
+  .sz-warn { background: var(--amber-bg); color: var(--amber); }
+  .sz-err { background: var(--red-bg); color: var(--red); }
 
-/* Preview */
-.pv-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-.pv-box { background: var(--surface2); border: 0.5px solid var(--border); border-radius: var(--radius-sm); padding: .75rem; text-align: center; }
-.pv-lbl { font-size: 11px; color: var(--text3); margin-bottom: 8px; font-weight: 500; }
-.pv-box canvas { max-width:100%; height:90px; object-fit:contain; border-radius:4px; background: repeating-conic-gradient(#ccc 0% 25%,#eee 0% 50%) 0 0/14px 14px; display:block; margin:0 auto; }
-.pv-meta { font-size: 11px; color: var(--text2); margin-top: 6px; }
+  /* Status */
+  .status { margin-top: 1rem; padding: 0.625rem 0.875rem; border-radius: var(--radius-sm); font-size: 13px; display: none; }
+  .status.ok  { background: var(--green-bg); color: var(--green); border: 0.5px solid #C0DD97; }
+  .status.warn{ background: var(--amber-bg); color: var(--amber); border: 0.5px solid #FAC775; }
+  .status.err { background: var(--red-bg);   color: var(--red);   border: 0.5px solid #F7C1C1; }
 
-/* Badges */
-.sz-badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
-.sz-ok  { background: var(--green-bg); color: var(--green); }
-.sz-warn{ background: var(--amber-bg); color: var(--amber); }
-.sz-err { background: var(--red-bg);   color: var(--red);   }
+  /* Buttons */
+  .btn-row { display: flex; gap: 10px; margin-top: 1rem; }
+  .btn { padding: 9px 20px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; border: none; transition: opacity 0.15s, background 0.15s; display: flex; align-items: center; gap: 6px; }
+  .btn-primary { background: var(--text); color: #fff; }
+  .btn-primary:hover { opacity: 0.82; }
+  .btn-primary:disabled { opacity: 0.35; cursor: not-allowed; }
+  .btn-sec { background: transparent; color: var(--text2); border: 0.5px solid var(--border2); }
+  .btn-sec:hover { background: var(--surface2); }
 
-/* Status */
-.status { margin-top: 1rem; padding: .625rem .875rem; border-radius: var(--radius-sm); font-size: 13px; display: none; }
-.status.ok   { background: var(--green-bg); color: var(--green); border: 0.5px solid var(--green-bd); }
-.status.warn { background: var(--amber-bg); color: var(--amber); border: 0.5px solid var(--amber-bd); }
-.status.err  { background: var(--red-bg);   color: var(--red);   border: 0.5px solid var(--red-bd); }
-
-/* Buttons */
-.btn-row { display: flex; gap: 10px; margin-top: 1rem; flex-wrap: wrap; }
-.btn { padding: 9px 18px; border-radius: var(--radius-sm); font-size: 13px; font-weight: 500; cursor: pointer; border: none; transition: opacity .15s, background .15s; }
-.btn-primary { background: var(--text); color: #fff; }
-.btn-primary:hover { opacity: .82; }
-.btn-primary:disabled { opacity: .35; cursor: not-allowed; }
-.btn-sec { background: transparent; color: var(--text2); border: 0.5px solid var(--border2); }
-.btn-sec:hover { background: var(--surface2); }
-.btn-green { background: var(--green); color: #fff; }
-.btn-green:hover { opacity: .88; }
-
-.hidden { display: none !important; }
-hr.div { border: none; border-top: 0.5px solid var(--border); margin: 1rem 0; }
+  .hidden { display: none !important; }
 </style>
 </head>
 <body>
 <div class="app">
-  <h1>Signature Resizer <span class="pill">3–30 KB</span></h1>
-  <p class="subtitle">Remove background · Crop · Resize · Export for govt exam portals</p>
+  <div class="app-header">
+    <h1>Signature Resizer <span class="pill">3–30 KB</span></h1>
+    <p>Remove background opacity &amp; resize for govt exam forms — UPSC, SSC, IBPS &amp; more</p>
+  </div>
 
   <!-- Drop zone -->
   <div class="drop-zone" id="dropZone">
-    <div class="drop-icon">🖊️</div>
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M4 16.004V17a3 3 0 003 3h10a3 3 0 003-3v-1M12 4v12m-4-4l4-4 4 4"/>
+    </svg>
     <div class="drop-label">Drop your signature image here</div>
     <div class="drop-sub">or click to browse &nbsp;·&nbsp; JPG, PNG, BMP accepted</div>
     <input type="file" id="fileInput" accept="image/*">
   </div>
 
-  <!-- Main UI (hidden until image loaded) -->
-  <div id="mainUI" class="hidden">
+  <!-- Controls (hidden until file loaded) -->
+  <div id="controls" class="hidden">
+    <div class="section">
+      <div class="sec-label">Processing options</div>
+      <div class="controls-grid">
 
-    <!-- Tabs -->
-    <div class="tabs">
-      <button class="tab active" data-tab="crop">✂️ Crop</button>
-      <button class="tab" data-tab="resize">↔️ Resize</button>
-      <button class="tab" data-tab="process">🎨 Background</button>
-      <button class="tab" data-tab="export">📥 Export</button>
-    </div>
-
-    <!-- ── CROP TAB ── -->
-    <div class="panel active" id="tab-crop">
-      <div class="sec-label">Drag to select crop area</div>
-      <div class="crop-wrap" id="cropWrap">
-        <canvas id="cropCanvas"></canvas>
-        <div id="selBox"></div>
-      </div>
-      <div class="ctrl-grid">
-        <div class="ctrl">
-          <label>Crop X &nbsp;<span class="val-badge" id="cropXVal">0</span> px</label>
-          <div class="range-wrap">
-            <span class="rng-lbl">0</span>
-            <input type="range" id="cropX" min="0" value="0" step="1">
-            <span class="rng-lbl" id="cropXMax">—</span>
-          </div>
-        </div>
-        <div class="ctrl">
-          <label>Crop Y &nbsp;<span class="val-badge" id="cropYVal">0</span> px</label>
-          <div class="range-wrap">
-            <span class="rng-lbl">0</span>
-            <input type="range" id="cropY" min="0" value="0" step="1">
-            <span class="rng-lbl" id="cropYMax">—</span>
-          </div>
-        </div>
-        <div class="ctrl">
-          <label>Crop Width &nbsp;<span class="val-badge" id="cropWVal">—</span> px</label>
-          <div class="range-wrap">
-            <span class="rng-lbl">10</span>
-            <input type="range" id="cropW" min="10" value="100" step="1">
-            <span class="rng-lbl" id="cropWMax">—</span>
-          </div>
-        </div>
-        <div class="ctrl">
-          <label>Crop Height &nbsp;<span class="val-badge" id="cropHVal">—</span> px</label>
-          <div class="range-wrap">
-            <span class="rng-lbl">10</span>
-            <input type="range" id="cropH" min="10" value="100" step="1">
-            <span class="rng-lbl" id="cropHMax">—</span>
-          </div>
-        </div>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-green" id="applyCropBtn">Apply Crop</button>
-        <button class="btn btn-sec" id="resetCropBtn">Reset Crop</button>
-      </div>
-    </div>
-
-    <!-- ── RESIZE TAB ── -->
-    <div class="panel" id="tab-resize">
-      <div class="card">
-        <div class="sec-label">Output dimensions</div>
-        <div style="display:flex; align-items:flex-end; gap:12px; flex-wrap:wrap;">
-          <div>
-            <label style="font-size:12px; color:var(--text2); display:block; margin-bottom:4px;">Width (px)</label>
-            <input type="number" id="resW" min="1" max="5000" style="width:100px; padding:6px 8px; border:0.5px solid var(--border2); border-radius:var(--radius-sm); font-size:14px; font-weight:500; color:var(--text); background:var(--surface);">
-          </div>
-          <div style="padding-bottom:8px; color:var(--text3); font-size:18px;">×</div>
-          <div>
-            <label style="font-size:12px; color:var(--text2); display:block; margin-bottom:4px;">Height (px)</label>
-            <input type="number" id="resH" min="1" max="5000" style="width:100px; padding:6px 8px; border:0.5px solid var(--border2); border-radius:var(--radius-sm); font-size:14px; font-weight:500; color:var(--text); background:var(--surface);">
-          </div>
-          <div style="padding-bottom:8px;">
-            <button class="lock-btn locked" id="lockAR" title="Lock aspect ratio">🔒 Aspect ratio</button>
-          </div>
-        </div>
-
-        <hr class="div">
-
-        <div class="sec-label">Quick presets</div>
-        <div style="display:flex; gap:8px; flex-wrap:wrap;">
-          <button class="btn btn-sec preset-btn" data-w="200" data-h="100">200×100</button>
-          <button class="btn btn-sec preset-btn" data-w="300" data-h="100">300×100</button>
-          <button class="btn btn-sec preset-btn" data-w="400" data-h="150">400×150</button>
-          <button class="btn btn-sec preset-btn" data-w="140" data-h="60">140×60</button>
-          <button class="btn btn-sec preset-btn" data-w="280" data-h="80">280×80</button>
-        </div>
-
-        <hr class="div">
-
-        <div class="sec-label">Scale</div>
-        <div class="range-wrap">
-          <span class="rng-lbl">10%</span>
-          <input type="range" id="scaleSlider" min="10" max="200" value="100" step="1">
-          <span class="rng-lbl">200%</span>
-          <span style="font-size:13px; font-weight:600; min-width:42px; text-align:right;" id="scaleVal">100%</span>
-        </div>
-      </div>
-      <div class="btn-row">
-        <button class="btn btn-green" id="applyResizeBtn">Apply Resize</button>
-        <button class="btn btn-sec" id="resetResizeBtn">Reset Size</button>
-      </div>
-    </div>
-
-    <!-- ── BACKGROUND TAB ── -->
-    <div class="panel" id="tab-process">
-      <div class="card">
-        <div class="ctrl-grid">
-          <div class="ctrl">
-            <div class="row">
-              <div>
-                <div class="ctrl-title">Remove background</div>
-              </div>
-              <label class="toggle"><input type="checkbox" id="removeBg" checked><span class="tog"></span></label>
+        <div class="ctrl-card">
+          <div class="toggle-row">
+            <div>
+              <div class="ctrl-title">Remove background</div>
             </div>
-            <div class="ctrl-hint">Removes white/light pixels</div>
+            <label class="toggle">
+              <input type="checkbox" id="removeBg" checked>
+              <span class="tog-track"></span>
+            </label>
           </div>
-          <div class="ctrl">
-            <div class="row">
-              <div>
-                <div class="ctrl-title">White background</div>
-              </div>
-              <label class="toggle"><input type="checkbox" id="whiteBg"><span class="tog"></span></label>
-            </div>
-            <div class="ctrl-hint">Fill transparent areas with white</div>
-          </div>
-          <div class="ctrl full">
-            <label>Tolerance &nbsp;<span class="val-badge" id="tolVal">40</span></label>
-            <div class="range-wrap">
-              <span class="rng-lbl">0</span>
-              <input type="range" id="tolerance" min="0" max="120" value="40" step="1">
-              <span class="rng-lbl">120</span>
-            </div>
-            <div class="ctrl-hint" style="margin-top:6px;">Higher = removes more background. Lower if ink colour is light.</div>
-          </div>
+          <div class="ctrl-hint">Removes white/light background pixels</div>
         </div>
+
+        <div class="ctrl-card">
+          <div class="toggle-row">
+            <div>
+              <div class="ctrl-title">White background</div>
+            </div>
+            <label class="toggle">
+              <input type="checkbox" id="whiteBg">
+              <span class="tog-track"></span>
+            </label>
+          </div>
+          <div class="ctrl-hint">Fill transparent areas with white</div>
+        </div>
+
+        <div class="ctrl-card full">
+          <label>Background removal tolerance &nbsp;<span class="val-badge" id="tolVal">40</span></label>
+          <div class="range-wrap">
+            <span class="rng-min">0</span>
+            <input type="range" id="tolerance" min="0" max="120" value="40" step="1">
+            <span class="rng-max">120</span>
+          </div>
+          <div class="ctrl-hint" style="margin-top:6px;">Higher = removes more light pixels. Lower if your ink is light.</div>
+        </div>
+
+        <div class="ctrl-card full">
+          <label>Target output size &nbsp;<span class="val-badge" id="targetVal">20</span> KB</label>
+          <div class="range-wrap">
+            <span class="rng-min">3</span>
+            <input type="range" id="targetSize" min="3" max="30" value="20" step="1">
+            <span class="rng-max">30</span>
+          </div>
+          <div class="ctrl-hint" style="margin-top:6px;">Minimum 3 KB · Maximum 30 KB required by most portals</div>
+        </div>
+
       </div>
     </div>
 
-    <!-- ── EXPORT TAB ── -->
-    <div class="panel" id="tab-export">
-      <div class="card">
-        <div class="ctrl-grid">
-          <div class="ctrl full">
-            <label>Target file size &nbsp;<span class="val-badge" id="targetVal">20</span> KB</label>
-            <div class="range-wrap">
-              <span class="rng-lbl">3</span>
-              <input type="range" id="targetSize" min="3" max="30" value="20" step="1">
-              <span class="rng-lbl">30</span>
-            </div>
-            <div class="ctrl-hint" style="margin-top:6px;">Must be between 3 KB and 30 KB for most govt portals</div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- ── PREVIEW (always visible below tabs) ── -->
-    <div style="margin-top:1.25rem;">
+    <!-- Preview -->
+    <div class="section" id="previewSection">
       <div class="sec-label">Preview</div>
-      <div class="pv-grid">
+      <div class="preview-grid">
         <div class="pv-box">
           <div class="pv-lbl">Original</div>
           <canvas id="origCanvas"></canvas>
           <div class="pv-meta" id="origMeta">—</div>
         </div>
         <div class="pv-box">
-          <div class="pv-lbl">Output</div>
+          <div class="pv-lbl">Processed</div>
           <canvas id="procCanvas"></canvas>
           <div class="pv-meta" id="procMeta">—</div>
         </div>
@@ -300,85 +210,59 @@ hr.div { border: none; border-top: 0.5px solid var(--border); margin: 1rem 0; }
     <div id="statusBar" class="status"></div>
 
     <div class="btn-row">
-      <button class="btn btn-primary" id="downloadBtn">📥 Process &amp; Download</button>
-      <button class="btn btn-sec" id="resetAllBtn">Reset All</button>
+      <button class="btn btn-primary" id="downloadBtn">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+        Process &amp; Download
+      </button>
+      <button class="btn btn-sec" id="resetBtn">Reset</button>
     </div>
   </div>
 </div>
 
 <script>
-/* ── State ── */
-let masterImg   = null;   // always the originally loaded image
-let workImg     = null;   // after crop applied (HTMLImageElement or canvas)
-let cropApplied = { x:0, y:0, w:0, h:0, applied: false };
-let resizeW     = 0, resizeH = 0;
-let origW = 0, origH = 0;
-let arLocked    = true;
-let origAR      = 1;
-
-/* ── DOM refs ── */
 const dropZone   = document.getElementById('dropZone');
 const fileInput  = document.getElementById('fileInput');
-const mainUI     = document.getElementById('mainUI');
-const origCanvas = document.getElementById('origCanvas');
-const procCanvas = document.getElementById('procCanvas');
-const origMeta   = document.getElementById('origMeta');
-const procMeta   = document.getElementById('procMeta');
-const statusBar  = document.getElementById('statusBar');
-const downloadBtn= document.getElementById('downloadBtn');
+const controls   = document.getElementById('controls');
 const removeBgCk = document.getElementById('removeBg');
 const whiteBgCk  = document.getElementById('whiteBg');
 const tolSlider  = document.getElementById('tolerance');
 const tolValEl   = document.getElementById('tolVal');
 const targetSldr = document.getElementById('targetSize');
 const targetValEl= document.getElementById('targetVal');
-const cropCanvas = document.getElementById('cropCanvas');
-const cropWrap   = document.getElementById('cropWrap');
-const selBox     = document.getElementById('selBox');
-const cropXSldr  = document.getElementById('cropX');
-const cropYSldr  = document.getElementById('cropY');
-const cropWSldr  = document.getElementById('cropW');
-const cropHSldr  = document.getElementById('cropH');
-const resWEl     = document.getElementById('resW');
-const resHEl     = document.getElementById('resH');
-const scaleSldr  = document.getElementById('scaleSlider');
-const lockARBtn  = document.getElementById('lockAR');
+const downloadBtn= document.getElementById('downloadBtn');
+const resetBtn   = document.getElementById('resetBtn');
+const origCanvas = document.getElementById('origCanvas');
+const procCanvas = document.getElementById('procCanvas');
+const origMeta   = document.getElementById('origMeta');
+const procMeta   = document.getElementById('procMeta');
+const statusBar  = document.getElementById('statusBar');
 
-/* ── Tabs ── */
-document.querySelectorAll('.tab').forEach(t => {
-  t.addEventListener('click', () => {
-    document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
-    document.querySelectorAll('.panel').forEach(x => x.classList.remove('active'));
-    t.classList.add('active');
-    document.getElementById('tab-' + t.dataset.tab).classList.add('active');
-    if (t.dataset.tab === 'crop') drawCropCanvas();
-  });
-});
+let origImg = null;
+let origFileSize = 0;
 
-/* ── Drop / file ── */
+/* ── Drag & drop ── */
 dropZone.addEventListener('click', () => fileInput.click());
 dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('drag'); });
 dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag'));
-dropZone.addEventListener('drop', e => { e.preventDefault(); dropZone.classList.remove('drag'); if (e.dataTransfer.files[0]) loadFile(e.dataTransfer.files[0]); });
+dropZone.addEventListener('drop', e => {
+  e.preventDefault(); dropZone.classList.remove('drag');
+  const f = e.dataTransfer.files[0];
+  if (f) loadFile(f);
+});
 fileInput.addEventListener('change', () => { if (fileInput.files[0]) loadFile(fileInput.files[0]); });
 
+/* ── Load file ── */
 function loadFile(f) {
+  origFileSize = f.size;
   const reader = new FileReader();
   reader.onload = ev => {
     const img = new Image();
     img.onload = () => {
-      masterImg = img; workImg = img;
-      origW = img.width; origH = img.height;
-      origAR = origW / origH;
-      resizeW = origW; resizeH = origH;
-      cropApplied = { x:0, y:0, w:origW, h:origH, applied:false };
-      initCropSliders(origW, origH);
-      resWEl.value = origW; resHEl.value = origH;
-      scaleSldr.value = 100;
-      document.getElementById('scaleVal').textContent = '100%';
-      drawOrigPreview(img, f.size);
-      mainUI.classList.remove('hidden');
-      drawCropCanvas();
+      origImg = img;
+      drawToCanvas(origCanvas, img, null);
+      origMeta.textContent = img.width + '×' + img.height + 'px · ' + (f.size/1024).toFixed(1) + ' KB';
+      controls.classList.remove('hidden');
+      showStatus('', '');
       runPreview();
     };
     img.src = ev.target.result;
@@ -386,373 +270,149 @@ function loadFile(f) {
   reader.readAsDataURL(f);
 }
 
-/* ── Draw original preview ── */
-function drawOrigPreview(img, size) {
-  const r = Math.min(260/img.width, 90/img.height, 1);
-  origCanvas.width  = Math.round(img.width  * r);
-  origCanvas.height = Math.round(img.height * r);
-  const ctx = origCanvas.getContext('2d');
-  ctx.clearRect(0,0,origCanvas.width,origCanvas.height);
-  ctx.drawImage(img, 0, 0, origCanvas.width, origCanvas.height);
-  origMeta.textContent = img.width + '×' + img.height + 'px · ' + (size/1024).toFixed(1) + ' KB';
+/* ── Draw to preview canvas ── */
+function drawToCanvas(canvas, img, offscreen) {
+  const src = offscreen || img;
+  const ratio = Math.min(260 / src.width, 90 / src.height, 1);
+  canvas.width  = Math.round(src.width  * ratio);
+  canvas.height = Math.round(src.height * ratio);
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0, 0, canvas.width, canvas.height);
+  ctx.drawImage(src, 0, 0, canvas.width, canvas.height);
 }
 
-/* ══════════════ CROP ══════════════ */
-let cropDrag = null; // {startX, startY, selStartX, selStartY}
-let selX=0, selY=0, selW=0, selH=0;
-let displayScale = 1; // canvas display px / image px
-
-function drawCropCanvas() {
-  if (!workImg) return;
-  const src = workImg;
-  const maxW = cropWrap.clientWidth || 600;
-  const maxH = 260;
-  const r = Math.min(maxW / src.width, maxH / src.height, 1);
-  displayScale = r;
-  cropCanvas.width  = Math.round(src.width  * r);
-  cropCanvas.height = Math.round(src.height * r);
-  const ctx = cropCanvas.getContext('2d');
-  ctx.clearRect(0,0,cropCanvas.width, cropCanvas.height);
-  ctx.drawImage(src, 0, 0, cropCanvas.width, cropCanvas.height);
-  updateSelBoxFromSliders();
-}
-
-function updateSelBoxFromSliders() {
-  const src = workImg; if (!src) return;
-  const r = displayScale;
-  const x = parseInt(cropXSldr.value), y = parseInt(cropYSldr.value);
-  const w = parseInt(cropWSldr.value), h = parseInt(cropHSldr.value);
-  const bx = cropCanvas.getBoundingClientRect();
-  const ox = cropWrap.getBoundingClientRect().left;
-  selBox.style.display = 'block';
-  selBox.style.left   = (x * r) + 'px';
-  selBox.style.top    = (y * r) + 'px';
-  selBox.style.width  = (w * r) + 'px';
-  selBox.style.height = (h * r) + 'px';
-  document.getElementById('cropXVal').textContent = x;
-  document.getElementById('cropYVal').textContent = y;
-  document.getElementById('cropWVal').textContent = w;
-  document.getElementById('cropHVal').textContent = h;
-}
-
-function initCropSliders(w, h) {
-  cropXSldr.max = w - 1; cropXSldr.value = 0;
-  cropYSldr.max = h - 1; cropYSldr.value = 0;
-  cropWSldr.max = w;     cropWSldr.value = w;
-  cropHSldr.max = h;     cropHSldr.value = h;
-  document.getElementById('cropXMax').textContent = w;
-  document.getElementById('cropYMax').textContent = h;
-  document.getElementById('cropWMax').textContent = w;
-  document.getElementById('cropHMax').textContent = h;
-  document.getElementById('cropXVal').textContent = 0;
-  document.getElementById('cropYVal').textContent = 0;
-  document.getElementById('cropWVal').textContent = w;
-  document.getElementById('cropHVal').textContent = h;
-}
-
-[cropXSldr, cropYSldr, cropWSldr, cropHSldr].forEach(s => {
-  s.addEventListener('input', () => {
-    const src = workImg; if (!src) return;
-    const maxX = src.width  - parseInt(cropWSldr.value);
-    const maxY = src.height - parseInt(cropHSldr.value);
-    if (parseInt(cropXSldr.value) > maxX) cropXSldr.value = Math.max(0, maxX);
-    if (parseInt(cropYSldr.value) > maxY) cropYSldr.value = Math.max(0, maxY);
-    cropXSldr.max = src.width  - parseInt(cropWSldr.value);
-    cropYSldr.max = src.height - parseInt(cropHSldr.value);
-    updateSelBoxFromSliders();
-    runPreview();
-  });
-});
-
-/* Mouse drag on crop canvas */
-cropWrap.addEventListener('mousedown', e => {
-  const rect = cropCanvas.getBoundingClientRect();
-  const mx = e.clientX - rect.left, my = e.clientY - rect.top;
-  if (mx < 0 || my < 0 || mx > cropCanvas.width || my > cropCanvas.height) return;
-  cropDrag = { startX: mx, startY: my };
-  selBox.style.display = 'block';
-  e.preventDefault();
-});
-window.addEventListener('mousemove', e => {
-  if (!cropDrag || !workImg) return;
-  const rect = cropCanvas.getBoundingClientRect();
-  const mx = Math.max(0, Math.min(e.clientX - rect.left, cropCanvas.width));
-  const my = Math.max(0, Math.min(e.clientY - rect.top,  cropCanvas.height));
-  const r = displayScale;
-  let sx = Math.min(cropDrag.startX, mx), sy = Math.min(cropDrag.startY, my);
-  let sw = Math.abs(mx - cropDrag.startX), sh = Math.abs(my - cropDrag.startY);
-  selBox.style.left = sx + 'px'; selBox.style.top = sy + 'px';
-  selBox.style.width = sw + 'px'; selBox.style.height = sh + 'px';
-  const ix = Math.round(sx/r), iy = Math.round(sy/r);
-  const iw = Math.max(1, Math.round(sw/r)), ih = Math.max(1, Math.round(sh/r));
-  cropXSldr.value = ix; cropYSldr.value = iy;
-  cropWSldr.value = Math.min(iw, workImg.width - ix);
-  cropHSldr.value = Math.min(ih, workImg.height - iy);
-  document.getElementById('cropXVal').textContent = ix;
-  document.getElementById('cropYVal').textContent = iy;
-  document.getElementById('cropWVal').textContent = cropWSldr.value;
-  document.getElementById('cropHVal').textContent = cropHSldr.value;
-  runPreview();
-});
-window.addEventListener('mouseup', () => { cropDrag = null; });
-
-/* Touch support for crop */
-cropWrap.addEventListener('touchstart', e => {
-  const rect = cropCanvas.getBoundingClientRect();
-  const t = e.touches[0];
-  const mx = t.clientX - rect.left, my = t.clientY - rect.top;
-  cropDrag = { startX: mx, startY: my };
-  e.preventDefault();
-}, { passive: false });
-window.addEventListener('touchmove', e => {
-  if (!cropDrag || !workImg) return;
-  const rect = cropCanvas.getBoundingClientRect();
-  const t = e.touches[0];
-  const mx = Math.max(0, Math.min(t.clientX - rect.left, cropCanvas.width));
-  const my = Math.max(0, Math.min(t.clientY - rect.top,  cropCanvas.height));
-  const r = displayScale;
-  let sx = Math.min(cropDrag.startX, mx), sy = Math.min(cropDrag.startY, my);
-  let sw = Math.abs(mx - cropDrag.startX), sh = Math.abs(my - cropDrag.startY);
-  selBox.style.left = sx+'px'; selBox.style.top = sy+'px';
-  selBox.style.width = sw+'px'; selBox.style.height = sh+'px';
-  const ix = Math.round(sx/r), iy = Math.round(sy/r);
-  const iw = Math.max(1, Math.round(sw/r)), ih = Math.max(1, Math.round(sh/r));
-  cropXSldr.value = ix; cropYSldr.value = iy;
-  cropWSldr.value = Math.min(iw, workImg.width - ix);
-  cropHSldr.value = Math.min(ih, workImg.height - iy);
-  document.getElementById('cropXVal').textContent = ix;
-  document.getElementById('cropYVal').textContent = iy;
-  document.getElementById('cropWVal').textContent = cropWSldr.value;
-  document.getElementById('cropHVal').textContent = cropHSldr.value;
-  runPreview();
-}, { passive: false });
-window.addEventListener('touchend', () => { cropDrag = null; });
-
-document.getElementById('applyCropBtn').addEventListener('click', () => {
-  if (!workImg) return;
-  const cx = parseInt(cropXSldr.value), cy = parseInt(cropYSldr.value);
-  const cw = parseInt(cropWSldr.value), ch = parseInt(cropHSldr.value);
-  const oc = document.createElement('canvas');
-  oc.width = cw; oc.height = ch;
-  oc.getContext('2d').drawImage(workImg, cx, cy, cw, ch, 0, 0, cw, ch);
-  const croppedImg = new Image();
-  croppedImg.onload = () => {
-    workImg = croppedImg;
-    resizeW = cw; resizeH = ch;
-    resWEl.value = cw; resHEl.value = ch;
-    origAR = cw / ch;
-    initCropSliders(cw, ch);
-    drawCropCanvas();
-    updateOrigPreviewFromWork();
-    runPreview();
-  };
-  croppedImg.src = oc.toDataURL();
-  showStatus('✓ Crop applied — ' + cw + '×' + ch + ' px', 'ok');
-});
-
-document.getElementById('resetCropBtn').addEventListener('click', () => {
-  if (!masterImg) return;
-  workImg = masterImg;
-  origAR = masterImg.width / masterImg.height;
-  resizeW = masterImg.width; resizeH = masterImg.height;
-  resWEl.value = resizeW; resHEl.value = resizeH;
-  initCropSliders(masterImg.width, masterImg.height);
-  drawCropCanvas();
-  updateOrigPreviewFromWork();
-  runPreview();
-  showStatus('Crop reset to original', 'ok');
-});
-
-function updateOrigPreviewFromWork() {
-  if (!workImg) return;
-  const r = Math.min(260/workImg.width, 90/workImg.height, 1);
-  origCanvas.width  = Math.round(workImg.width  * r);
-  origCanvas.height = Math.round(workImg.height * r);
-  const ctx = origCanvas.getContext('2d');
-  ctx.clearRect(0,0,origCanvas.width,origCanvas.height);
-  ctx.drawImage(workImg, 0,0, origCanvas.width, origCanvas.height);
-  origMeta.textContent = workImg.width + '×' + workImg.height + 'px';
-}
-
-/* ══════════════ RESIZE ══════════════ */
-lockARBtn.addEventListener('click', () => {
-  arLocked = !arLocked;
-  lockARBtn.classList.toggle('locked', arLocked);
-  lockARBtn.textContent = arLocked ? '🔒 Aspect ratio' : '🔓 Aspect ratio';
-});
-
-resWEl.addEventListener('input', () => {
-  const w = parseInt(resWEl.value) || 1;
-  if (arLocked && workImg) resHEl.value = Math.round(w / (workImg.width / workImg.height));
-  resizeW = parseInt(resWEl.value); resizeH = parseInt(resHEl.value);
-  scaleSldr.value = Math.round((w / (workImg ? workImg.width : 1)) * 100);
-  document.getElementById('scaleVal').textContent = scaleSldr.value + '%';
-  runPreview();
-});
-resHEl.addEventListener('input', () => {
-  const h = parseInt(resHEl.value) || 1;
-  if (arLocked && workImg) resWEl.value = Math.round(h * (workImg.width / workImg.height));
-  resizeW = parseInt(resWEl.value); resizeH = parseInt(resHEl.value);
-  runPreview();
-});
-
-scaleSldr.addEventListener('input', () => {
-  document.getElementById('scaleVal').textContent = scaleSldr.value + '%';
-  if (!workImg) return;
-  const s = parseInt(scaleSldr.value) / 100;
-  resizeW = Math.max(1, Math.round(workImg.width * s));
-  resizeH = Math.max(1, Math.round(workImg.height * s));
-  resWEl.value = resizeW; resHEl.value = resizeH;
-  runPreview();
-});
-
-document.querySelectorAll('.preset-btn').forEach(b => {
-  b.addEventListener('click', () => {
-    resizeW = parseInt(b.dataset.w); resizeH = parseInt(b.dataset.h);
-    resWEl.value = resizeW; resHEl.value = resizeH;
-    if (workImg) scaleSldr.value = Math.round((resizeW / workImg.width) * 100);
-    document.getElementById('scaleVal').textContent = scaleSldr.value + '%';
-    runPreview();
-  });
-});
-
-document.getElementById('applyResizeBtn').addEventListener('click', () => {
-  if (!workImg) return;
-  const w = parseInt(resWEl.value) || workImg.width;
-  const h = parseInt(resHEl.value) || workImg.height;
-  const oc = document.createElement('canvas');
-  oc.width = w; oc.height = h;
-  oc.getContext('2d').drawImage(workImg, 0,0, w, h);
-  const ri = new Image();
-  ri.onload = () => {
-    workImg = ri; resizeW = w; resizeH = h;
-    initCropSliders(w, h);
-    drawCropCanvas();
-    updateOrigPreviewFromWork();
-    runPreview();
-  };
-  ri.src = oc.toDataURL();
-  showStatus('✓ Resize applied — ' + w + '×' + h + ' px', 'ok');
-});
-
-document.getElementById('resetResizeBtn').addEventListener('click', () => {
-  if (!workImg) return;
-  resizeW = workImg.width; resizeH = workImg.height;
-  resWEl.value = resizeW; resHEl.value = resizeH;
-  scaleSldr.value = 100; document.getElementById('scaleVal').textContent = '100%';
-  runPreview();
-});
-
-/* ══════════════ PROCESS / EXPORT ══════════════ */
-[removeBgCk, whiteBgCk].forEach(el => el.addEventListener('change', runPreview));
-tolSlider.addEventListener('input', () => { tolValEl.textContent = tolSlider.value; runPreview(); });
-targetSldr.addEventListener('input', () => { targetValEl.textContent = targetSldr.value; runPreview(); });
-
-function buildOutput() {
-  if (!workImg) return null;
+/* ── Process image ── */
+function processImage() {
+  if (!origImg) return null;
   const tol = parseInt(tolSlider.value);
   const doRemove = removeBgCk.checked;
   const doWhite  = whiteBgCk.checked;
-  const outW = parseInt(resWEl.value) || workImg.width;
-  const outH = parseInt(resHEl.value) || workImg.height;
 
   const oc = document.createElement('canvas');
-  oc.width = outW; oc.height = outH;
+  oc.width = origImg.width; oc.height = origImg.height;
   const ctx = oc.getContext('2d');
-  if (doWhite) { ctx.fillStyle = '#fff'; ctx.fillRect(0,0,outW,outH); }
-  ctx.drawImage(workImg, 0,0, outW, outH);
+
+  if (doWhite) { ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, oc.width, oc.height); }
+  ctx.drawImage(origImg, 0, 0);
 
   if (doRemove) {
-    const id = ctx.getImageData(0,0,outW,outH);
+    const id = ctx.getImageData(0, 0, oc.width, oc.height);
     const px = id.data;
     for (let i = 0; i < px.length; i += 4) {
-      if ((px[i]+px[i+1]+px[i+2])/3 > 255-tol) px[i+3] = 0;
+      const brightness = (px[i] + px[i+1] + px[i+2]) / 3;
+      if (brightness > 255 - tol) px[i+3] = 0;
     }
-    ctx.putImageData(id,0,0);
+    ctx.putImageData(id, 0, 0);
   }
 
   if (doWhite && doRemove) {
-    const id = ctx.getImageData(0,0,outW,outH);
+    const id = ctx.getImageData(0, 0, oc.width, oc.height);
     const px = id.data;
     for (let i = 0; i < px.length; i += 4) {
-      if (px[i+3]===0) { px[i]=255; px[i+1]=255; px[i+2]=255; px[i+3]=255; }
+      if (px[i+3] === 0) { px[i]=255; px[i+1]=255; px[i+2]=255; px[i+3]=255; }
     }
-    ctx.putImageData(id,0,0);
+    ctx.putImageData(id, 0, 0);
   }
+
   return oc;
 }
 
+/* ── Binary-search JPEG quality to hit target KB ── */
 function getDataUrl(canvas, targetKB) {
-  const tb = targetKB * 1024;
-  let lo=0.05, hi=0.99, q=0.85, dataUrl;
-  for (let i=0; i<16; i++) {
+  const targetBytes = targetKB * 1024;
+  let lo = 0.05, hi = 0.99, q = 0.85, dataUrl;
+
+  for (let i = 0; i < 16; i++) {
     dataUrl = canvas.toDataURL('image/jpeg', q);
     const sz = atob(dataUrl.split(',')[1]).length;
-    if (sz > tb) hi = q; else lo = q;
-    q = (lo+hi)/2;
+    if (sz > targetBytes) hi = q;
+    else lo = q;
+    q = (lo + hi) / 2;
   }
+
   dataUrl = canvas.toDataURL('image/jpeg', q);
-  if (atob(dataUrl.split(',')[1]).length < 3072) dataUrl = canvas.toDataURL('image/jpeg', 0.99);
+  const finalSz = atob(dataUrl.split(',')[1]).length;
+  if (finalSz < 3072) dataUrl = canvas.toDataURL('image/jpeg', 0.99);
   return dataUrl;
 }
 
+/* ── Live preview ── */
 function runPreview() {
-  const out = buildOutput(); if (!out) return;
-  const r = Math.min(260/out.width, 90/out.height, 1);
-  procCanvas.width  = Math.round(out.width  * r);
-  procCanvas.height = Math.round(out.height * r);
-  const ctx = procCanvas.getContext('2d');
-  ctx.clearRect(0,0,procCanvas.width,procCanvas.height);
-  ctx.drawImage(out,0,0,procCanvas.width,procCanvas.height);
+  const processed = processImage();
+  if (!processed) return;
+  drawToCanvas(procCanvas, null, processed);
 
   const targetKB = parseInt(targetSldr.value);
-  const dataUrl  = getDataUrl(out, targetKB);
+  const dataUrl  = getDataUrl(processed, targetKB);
   const bytes    = atob(dataUrl.split(',')[1]).length;
-  const kb       = (bytes/1024).toFixed(1);
+  const kb       = (bytes / 1024).toFixed(1);
 
-  let cls, msg, stype;
-  if (bytes>=3072 && bytes<=30720)  { cls='sz-ok';   stype='ok';   msg='✓ '+kb+' KB — within the 3–30 KB limit.'; }
-  else if (bytes<3072)              { cls='sz-warn';  stype='warn'; msg='⚠ '+kb+' KB — below 3 KB minimum. Increase target.'; }
-  else                              { cls='sz-err';   stype='err';  msg='✗ '+kb+' KB — above 30 KB limit. Lower target size.'; }
+  let badgeCls, msg, statusCls;
+  if (bytes >= 3072 && bytes <= 30720) {
+    badgeCls = 'sz-ok'; statusCls = 'ok';
+    msg = '✓ File is ' + kb + ' KB — within the 3–30 KB limit.';
+  } else if (bytes < 3072) {
+    badgeCls = 'sz-warn'; statusCls = 'warn';
+    msg = '⚠ File is ' + kb + ' KB — below the 3 KB minimum. Try increasing target size.';
+  } else {
+    badgeCls = 'sz-err'; statusCls = 'err';
+    msg = '✗ File is ' + kb + ' KB — above the 30 KB limit. Lower the target size.';
+  }
 
-  procMeta.innerHTML = out.width+'×'+out.height+'px &nbsp;·&nbsp; <span class="sz-badge '+cls+'">'+kb+' KB</span>';
-  showStatus(msg, stype);
+  procMeta.innerHTML = processed.width + '×' + processed.height + 'px &nbsp;·&nbsp; <span class="sz-badge ' + badgeCls + '">' + kb + ' KB</span>';
+  showStatus(msg, statusCls);
 }
 
+/* ── Status bar ── */
 function showStatus(msg, type) {
-  if (!msg) { statusBar.style.display='none'; return; }
+  if (!msg) { statusBar.style.display = 'none'; return; }
   statusBar.textContent = msg;
   statusBar.className = 'status ' + type;
   statusBar.style.display = 'block';
 }
 
+/* ── Slider live update ── */
+tolSlider.addEventListener('input', () => { tolValEl.textContent = tolSlider.value; runPreview(); });
+targetSldr.addEventListener('input', () => { targetValEl.textContent = targetSldr.value; runPreview(); });
+removeBgCk.addEventListener('change', runPreview);
+whiteBgCk.addEventListener('change', runPreview);
+
+/* ── Download ── */
 downloadBtn.addEventListener('click', () => {
-  if (!workImg) return;
+  if (!origImg) return;
   downloadBtn.disabled = true;
   downloadBtn.textContent = 'Processing…';
+
   setTimeout(() => {
-    const out = buildOutput();
-    const targetKB = parseInt(targetSldr.value);
-    const dataUrl  = getDataUrl(out, targetKB);
-    const bytes    = atob(dataUrl.split(',')[1]).length;
-    const kb       = (bytes/1024).toFixed(1);
+    const processed = processImage();
+    const targetKB  = parseInt(targetSldr.value);
+    const dataUrl   = getDataUrl(processed, targetKB);
+    const bytes     = atob(dataUrl.split(',')[1]).length;
+    const kb        = (bytes / 1024).toFixed(1);
+
     const a = document.createElement('a');
-    a.href = dataUrl; a.download = 'signature_'+kb+'kb.jpg';
-    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    a.href = dataUrl;
+    a.download = 'signature_' + kb + 'kb.jpg';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
     downloadBtn.disabled = false;
-    downloadBtn.textContent = '📥 Process & Download';
-    if (bytes>=3072 && bytes<=30720)
-      showStatus('✓ Downloaded! '+kb+' KB — valid for govt exam portals.', 'ok');
+    downloadBtn.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg> Process &amp; Download';
+
+    if (bytes >= 3072 && bytes <= 30720)
+      showStatus('✓ Downloaded! ' + kb + ' KB — valid for govt exam portals.', 'ok');
     else
-      showStatus('⚠ Downloaded at '+kb+' KB — adjust settings for 3–30 KB requirement.', 'warn');
+      showStatus('⚠ Downloaded at ' + kb + ' KB — adjust settings for the 3–30 KB requirement.', 'warn');
   }, 60);
 });
 
-document.getElementById('resetAllBtn').addEventListener('click', () => {
-  masterImg = null; workImg = null;
-  mainUI.classList.add('hidden');
+/* ── Reset ── */
+resetBtn.addEventListener('click', () => {
+  origImg = null; origFileSize = 0;
+  controls.classList.add('hidden');
   fileInput.value = '';
-  showStatus('','');
+  showStatus('', '');
 });
 </script>
 </body>
